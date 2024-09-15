@@ -1,16 +1,23 @@
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import css from "./SearchBox.module.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { changeFilter } from "../../redux/filtersSlice";
 
 export default function SearchBox() {
-  const [query, setQuery] = useState("");
   const dispatch = useDispatch();
   const id = useId();
 
-  const hadleChange = (e) => {
-    setQuery(e.target.value.trim().toLowerCase());
-    dispatch(changeFilter(e.target.value.trim().toLowerCase()));
+  const filter = useSelector((state) => state.filters.filter);
+  const [query, setQuery] = useState(filter || "");
+
+  useEffect(() => {
+    setQuery(filter);
+  }, [filter]);
+
+  const handleChange = (e) => {
+    const value = e.target.value.trim().toLowerCase();
+    setQuery(value);
+    dispatch(changeFilter(value));
   };
 
   return (
@@ -19,10 +26,10 @@ export default function SearchBox() {
         className={css.input}
         type="text"
         name="search"
-        placeholder=""
+        placeholder="Find contacts"
         id={id}
         value={query}
-        onChange={hadleChange}
+        onChange={handleChange}
       />
       <label className={css.label} htmlFor={id}>
         Find contacts
